@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const SAMBANOVA_API_URL = 'https://api.sambanova.com/v1'; // SambaNova Cloud API Base URL
-const LOCAL_API_BASE_URL = 'http://localhost:3000'; // Use your backend URL if deployed
+const SAMBANOVA_API_URL = 'https://api.sambanova.ai/v1';
+const LOCAL_API_BASE_URL = 'http://localhost:3000';
 
 const sambaNovaClient = axios.create({
     baseURL: SAMBANOVA_API_URL,
     headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer YOUR_SAMBANOVA_API_KEY`, // Replace with your actual API key
+        'Authorization': `Bearer YOUR_SAMBANOVA_API_KEY`,
     },
 });
 
@@ -52,10 +52,16 @@ export const fetchRouteData = async (origin, destination) => {
 
 export const askChatBot = async (question) => {
     try {
-        const response = await sambaNovaClient.post('/chat', {
-            query: question,
+        const response = await sambaNovaClient.post('/chat/completions', {
+            model: 'Meta-Llama-3.1-405B-Instruct',
+            messages: [
+                { role: 'system', content: 'You are a helpful assistant.' },
+                { role: 'user', content: question },
+            ],
+            max_tokens: 150,
+            temperature: 0.7,
         });
-        return response.data;
+        return response.data.choices[0].message.content;
     } catch (error) {
         console.error('Error getting chatbot response from SambaNova:', error);
         throw error;
