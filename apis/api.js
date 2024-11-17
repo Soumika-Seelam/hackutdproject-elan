@@ -1,9 +1,18 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000'; // Use your backend URL if deployed
+const SAMBANOVA_API_URL = 'https://api.sambanova.com/v1'; // SambaNova Cloud API Base URL
+const LOCAL_API_BASE_URL = 'http://localhost:3000'; // Use your backend URL if deployed
+
+const sambaNovaClient = axios.create({
+    baseURL: SAMBANOVA_API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer YOUR_SAMBANOVA_API_KEY`, // Replace with your actual API key
+    },
+});
 
 const apiClient = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: LOCAL_API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -43,10 +52,12 @@ export const fetchRouteData = async (origin, destination) => {
 
 export const askChatBot = async (question) => {
     try {
-        const response = await apiClient.post('/chat/ask', { question });
+        const response = await sambaNovaClient.post('/chat', {
+            query: question,
+        });
         return response.data;
     } catch (error) {
-        console.error('Error getting chatbot response:', error);
+        console.error('Error getting chatbot response from SambaNova:', error);
         throw error;
     }
 };
